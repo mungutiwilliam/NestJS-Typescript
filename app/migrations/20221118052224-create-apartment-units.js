@@ -5,9 +5,8 @@ module.exports = {
     await queryInterface.createTable('Apartment_units', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       house_no: {
         type: Sequelize.STRING

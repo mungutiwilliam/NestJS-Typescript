@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const app = express();
 const port = process.env.APP_PORT
 var models = require("./models");
+const user = require("./routes/user");
 
 
 
@@ -21,6 +22,7 @@ models.sequelize
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use("/api/user", user)
 
 
 

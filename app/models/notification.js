@@ -14,11 +14,22 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   notification.init({
-    id: DataTypes.UUID,
-    message: DataTypes.STRING
-  }, {
+    id: {
+      type: Sequelize.DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull:false,
+      primaryKey: true,
+    },
+    message: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull:false},
+    type: {
+      type: Sequelize.ENUM("announcement", "issues", "others"),
+      allowNull:false}
+  },
+   {
     sequelize,
-    modelName: 'notification',
+    modelName: 'Notification',
   });
   return notification;
 };

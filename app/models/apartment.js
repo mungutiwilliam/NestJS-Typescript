@@ -14,9 +14,24 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Apartment.init({
-    name: DataTypes.STRING,
-    location: DataTypes.STRING,
-    estate: DataTypes.STRING
+    id: {
+      type: Sequelize.DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull:false,
+      primaryKey: true,
+    },
+    name: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull:false},
+    location: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull:false},
+    estate: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull:false},
+    units: {
+      type: Sequelize.DataTypes.INTEGER,
+      allowNull:false}
   }, {
     sequelize,
     modelName: 'Apartment',

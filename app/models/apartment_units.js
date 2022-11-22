@@ -14,9 +14,22 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Apartment_units.init({
-    house_no: DataTypes.STRING,
-    rooms: DataTypes.INTEGER,
-    price: DataTypes.INTEGER
+    id: {
+      type: Sequelize.DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull:false,
+      primaryKey: true,
+    },
+    house_no:  {
+      type: Sequelize.DataTypes.STRING,
+      unique: true,
+      allowNull:false},
+    rooms:  {
+      type: Sequelize.DataTypes.INTEGER,
+      allowNull:false},
+    price:  {
+      type: Sequelize.DataTypes.INTEGER,
+      allowNull:false}
   }, {
     sequelize,
     modelName: 'Apartment_units',

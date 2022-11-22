@@ -14,9 +14,33 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User.init({
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING
+    id: {
+      type: Sequelize.DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull:false,
+      primaryKey: true,
+    },
+    firstName:{
+      type: Sequelize.DataTypes.STRING,
+      allowNull:false},
+    lastName: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull: false},
+    email: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull: false},
+    password: {
+      type: Sequelize.DataTypes.STRING,
+      allowNull: false},
+    phoneNumber: {
+      type: Sequelize.DataTypes.STRING,
+      max:10,
+      min:10,
+      allowNull: false,
+      unique:true},
+    role: {
+      type: Sequelize.ENUM("admin", "agent", "tenant"),
+        allowNull: false},
   }, {
     sequelize,
     modelName: 'User',

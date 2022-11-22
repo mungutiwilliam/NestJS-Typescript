@@ -5,14 +5,13 @@ module.exports = {
     await queryInterface.createTable('notifications', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      id: {
         type: Sequelize.UUID
       },
       message: {
+        type: Sequelize.STRING
+      },
+      type:{
         type: Sequelize.STRING
       },
       createdAt: {

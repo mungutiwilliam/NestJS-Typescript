@@ -14,12 +14,24 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   payment.init({
-    channel: DataTypes.STRING,
-    amount: DataTypes.INTEGER,
-    type: DataTypes.INTEGER
+    id: {
+      type: Sequelize.DataTypes.UUID,
+      defaultValue: Sequelize.UUIDV4,
+      allowNull:false,
+      primaryKey: true,
+    },
+    channel:{
+      type: Sequelize.DataTypes.STRING,
+      allowNull:false},
+    amount: {
+      type: Sequelize.DataTypes.INTEGER,
+      allowNull:false},
+    type:  {
+      type: Sequelize.ENUM("mpesa", "cheque", "bank_deposit"),
+      allowNull:false}
   }, {
     sequelize,
-    modelName: 'payment',
+    modelName: 'Payment',
   });
   return payment;
 };
