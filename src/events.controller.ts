@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { Like, MoreThan, Repository } from "typeorm";
 import { CreateEventDto } from "./create-event.dto";
 import { Event } from "./event.entity";
 import { UpdateEventDto } from "./update-event.dto";
@@ -26,6 +26,22 @@ export class EventsController {
         return this.repository.find();
     }
 
+    @Get('/practice')
+    async practice (){
+        return await this.repository.find({
+            select:['id','when'],
+            where: [{ id : MoreThan(3),
+            when: MoreThan(new Date('2021-02-12T13:00:00')) 
+        }, {
+            description: Like('%meet%')
+        }],
+        take:2,
+        order: {
+            id: 'DESC'
+        }
+        });
+    } 
+
     @Get(':id')
     // not including the parameter value in the @Param() function, the return value will have a kep value pair returned from the client side
     // the expected return will be  "id" : "id_value" else the return will ve just the value by itself
@@ -37,8 +53,9 @@ export class EventsController {
 
     @Post()
     // createEventDto is the predefined payload that nestjs will be expecting from the body
-    // its contents have been defined in the 'create-events-dto.ts' file 
-    async create(@Body() new_data: CreateEventDto) {
+    // its contents have been defined in the 'create-events-dto.ts' file
+    // the ValidationPipe enables the data coming in as the body to be validated  
+    async create(@Body(ValidationPipe) new_data: CreateEventDto) {
 
         return await this.repository.save({
             ... new_data,
