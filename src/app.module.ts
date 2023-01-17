@@ -2,8 +2,9 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Event } from './event.entity';
-import { EventsController } from './events.controller';
+import { Event } from './events/event.entity';
+import { EventsController } from './events/events.controller';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -22,7 +23,8 @@ import { EventsController } from './events.controller';
   // enables the injecting of the event repository
 
   // makes repository of specific entity available to be injected by Nest JS 
-  TypeOrmModule.forFeature([Event])
+  
+  EventsModule
 
 ],
 

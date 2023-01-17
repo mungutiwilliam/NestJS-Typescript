@@ -27,6 +27,7 @@ export class EventsController {
     }
 
     @Get('/practice')
+    // practice stands for the route to be used
     async practice (){
         return await this.repository.find({
             select:['id','when'],
@@ -55,7 +56,9 @@ export class EventsController {
     // createEventDto is the predefined payload that nestjs will be expecting from the body
     // its contents have been defined in the 'create-events-dto.ts' file
     // the ValidationPipe enables the data coming in as the body to be validated  
-    async create(@Body(ValidationPipe) new_data: CreateEventDto) {
+    async create(
+        // this is local validation ->   new ValidationPipe({groups:['create']})
+        @Body() new_data: CreateEventDto) {
 
         return await this.repository.save({
             ... new_data,
@@ -65,7 +68,11 @@ export class EventsController {
 
 
     @Patch(':id')
-    async update(@Param('id') id , @Body() new_data: UpdateEventDto ) {
+    async update(
+        @Param('id') id , 
+        // this is local validation ->   new ValidationPipe({groups:['update']})
+        
+        @Body() new_data: UpdateEventDto ) {
         // the UpdateEventDto now has all variables as optional
         // all properties are being extended from the CreateEventDto 
         new_data.address
@@ -83,7 +90,8 @@ export class EventsController {
 
     @Delete(':id')
     @HttpCode(204)
-    async remove(@Param('id') id) { 
+    async remove(
+        @Param('id') id) { 
         const event = await this.repository.findOne(id);
 
         await this.repository.remove(event);
