@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Event } from './events/event.entity';
-import { EventsController } from './events/events.controller';
 import { EventsModule } from './events/events.module';
 
 @Module({
@@ -28,7 +27,7 @@ import { EventsModule } from './events/events.module';
 
 ],
 
-  controllers: [AppController, EventsController],
+  controllers: [AppController],
   providers: [AppService],
 })
 
