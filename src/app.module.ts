@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
+import { AppJapanService } from './app.japan.service';
 import { AppService } from './app.service';
 import { Event } from './events/event.entity';
 import { EventsModule } from './events/events.module';
@@ -28,7 +29,10 @@ import { EventsModule } from './events/events.module';
 ],
 
   controllers: [AppController],
-  providers: [AppService],
+  providers: [{
+    provide: AppService,
+    useClass: AppJapanService
+  }],
 })
 
 

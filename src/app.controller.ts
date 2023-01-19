@@ -7,12 +7,12 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get("/14")
+  @Get("/hello")
   getHello(): string {
     return this.appService.getHello();
   }
 
-  @Get("/2")
+  @Get("/bye")
   getBye():string{
     return "This is Bye William"
   }
