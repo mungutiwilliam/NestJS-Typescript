@@ -1,22 +1,28 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppJapanService } from './app.japan.service';
 import { AppService } from './app.service';
+import { AppDummy } from './events/app.dummy';
 import { Event } from './events/event.entity';
 import { EventsModule } from './events/events.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot({
+  imports: [
+    // this enables you to use the .env file in your project without it you will not be able to use the .env file
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot({
 
     type: 'mysql',
-    host: '127.0.0.1',
-    port: 3306,
-    username: 'root',
-    password: 'example',
-    database: 'nest-events',
+    host: process.env.DB_HOST,
+    // Number changes a variable to a number
+    port:Number(process.env.DB_PORT),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     entities:[Event],
-    // the synchronise feature enable the database to be uodated whenever fields in an entity are updated
+    // the synchronise feature enable the database to be updated whenever fields in an entity are updated
     synchronize: true
 
   }),
@@ -31,8 +37,19 @@ import { EventsModule } from './events/events.module';
   controllers: [AppController],
   providers: [{
     provide: AppService,
-    useClass: AppJapanService
-  }],
+    useClass: AppService
+  }, {
+    // this is the name that will be used to inject the value below
+    provide: 'APP_NAME',
+    // this is the value that will be injected
+    useValue:'Nest Events backend!'
+  }, {
+    provide: 'MESSAGE',
+    // this makes the injectable a class exists. It has been imported at the top
+    inject: [AppDummy],
+    useFactory:(app)=>`${app.dummy()} Factory`
+
+  }, AppDummy],
 })
 
 
