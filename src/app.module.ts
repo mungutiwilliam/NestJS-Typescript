@@ -11,7 +11,9 @@ import { EventsModule } from './events/events.module';
 @Module({
   imports: [
     // this enables you to use the .env file in your project without it you will not be able to use the .env file
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
 
     type: 'mysql',
@@ -24,7 +26,6 @@ import { EventsModule } from './events/events.module';
     entities:[Event],
     // the synchronise feature enable the database to be updated whenever fields in an entity are updated
     synchronize: true
-
   }),
   // enables the injecting of the event repository
 

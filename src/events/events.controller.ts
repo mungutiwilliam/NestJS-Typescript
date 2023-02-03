@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Like, MoreThan, Repository } from "typeorm";
 import { CreateEventDto } from "./create-event.dto";
@@ -8,22 +8,27 @@ import { UpdateEventDto } from "./update-event.dto";
 
 @Controller('/events')
 export class EventsController {
+    private readonly logger = new Logger(EventsController.name);
+    // logger contains three log levels : debug, warning and error 
 
    constructor(
 
     // argument for the repository class is the entity object that will be used by the repository 
     @InjectRepository(Event)
     private readonly repository : Repository<Event>
-   ){
-
-   }
+   ){}
 
 
 
     @Get()
-    // find akk will return a list
+    // find all will return a list
+    
     async findAll(){
-        return this.repository.find();
+         // the logger class will show when the find all method is reached
+        this.logger.log('Hit the findAll route ');
+        const events = await this.repository.find();
+        this.logger.debug(`Found ${events.length} events`)
+        return events
     }
 
     @Get('/practice')
@@ -46,10 +51,17 @@ export class EventsController {
     @Get(':id')
     // not including the parameter value in the @Param() function, the return value will have a kep value pair returned from the client side
     // the expected return will be  "id" : "id_value" else the return will ve just the value by itself
-    async findOne (@Param('id') id) {
+    async findOne (@Param('id', ParseIntPipe) id: number) {
         
-        // the result of the findOne will naturally be returned by the code 
-        return await this.repository.findOne(id);
+        // the result of the findOne will naturally be returned by the code
+        const event = await this.repository.findOne({where: {id:id}});
+        
+        // when the event is not obtained, the error exception will be thrown
+        if(!event){
+            throw new NotFoundException();
+        }
+        
+        return event;
     }
 
     @Post()
@@ -69,7 +81,7 @@ export class EventsController {
 
     @Patch(':id')
     async update(
-        @Param('id') id , 
+        @Param('id', ParseIntPipe) id:number , 
         // this is local validation ->   new ValidationPipe({groups:['update']})
         
         @Body() new_data: UpdateEventDto ) {
@@ -78,7 +90,11 @@ export class EventsController {
         new_data.address
         new_data.description
 
-        const event = await this.repository.findOne(id);
+        const event = await this.repository.findOne({where: { id:id }});
+
+        if(!event){
+            throw new NotFoundException();
+        }
          
         return await this.repository.save({
             ...event,
@@ -91,8 +107,11 @@ export class EventsController {
     @Delete(':id')
     @HttpCode(204)
     async remove(
-        @Param('id') id) { 
-        const event = await this.repository.findOne(id);
+        @Param('id', ParseIntPipe) id:number) { 
+        const event = await this.repository.findOne({ where:{ id:id }});
+        if(!event){
+            throw new NotFoundException();
+        }
 
         await this.repository.remove(event);
 
