@@ -17,9 +17,11 @@ export class Event {
     @Column()
     address: string;
     //this is the attendees field that will hold all the people that will attend th event
-    @OneToMany(()=>Attendee, (attendee)=> attendee.event, {
-        // this makes the retrieval of related entities to be eager by default
-        eager: true
-    })
+    @OneToMany(()=>Attendee, (attendee)=> attendee.event, 
+    // {
+    //     // this makes the retrieval of related entities to be eager by default
+    //     //eager: true
+    // }
+    )
     attendees: Attendee[]
 }

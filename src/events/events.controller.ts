@@ -1,6 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { get } from "http";
 import { Like, MoreThan, Repository } from "typeorm";
 import { CreateEventDto } from "./create-event.dto";
 import { Event } from "./event.entity";
@@ -36,8 +35,12 @@ export class EventsController {
     // practice stands for the route to be used
     async practice (){
         return await this.repository.find({
+            // select only these two fields in the record
             select:['id','when'],
+            // giving the comdition to be met for each record
+            // in this case where the id of a record is more than the value guven
             where: [{ id : MoreThan(3),
+            
             when: MoreThan(new Date('2021-02-12T13:00:00')) 
         }, {
             description: Like('%meet%')
@@ -51,7 +54,16 @@ export class EventsController {
     
     @Get('practice2')
     async practice2(){
-        const event = await this.repository.findOne({where:{id: 7}})
+        const event = await this.repository.findOne({
+             where : { id : 1},
+            // the load Eager Relations options lets you turn off the eager options in the event entity class
+            // when this oprion is added the attendees will not be included in the result 
+            // loadEagerRelations : true
+
+            // relations options takes in an array of entities that have relations with the event entity
+            // when this is added it will return all attendees
+            relations:['attendees']
+        })
 
         // when the event is not obtained, the error exception will be thrown
         if(!event){
@@ -59,7 +71,6 @@ export class EventsController {
         }
 
         return event
-
     }
 
     @Get(':id')
