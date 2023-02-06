@@ -20,10 +20,3 @@ export class CreateEventDto {
     address: string;
 
 }
-
-export class CreateUser{
-    first_name: string;
-    last_name: string;
-    occupation: string;
-    living_location: string;
-}

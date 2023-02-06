@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Attendee } from "../attendee/attendee.entity";
 
 
 @Entity()
@@ -15,4 +16,10 @@ export class Event {
     when: Date;
     @Column()
     address: string;
+    //this is the attendees field that will hold all the people that will attend th event
+    @OneToMany(()=>Attendee, (attendee)=> attendee.event, {
+        // this makes the retrieval of related entities to be eager by default
+        eager: true
+    })
+    attendees: Attendee[]
 }

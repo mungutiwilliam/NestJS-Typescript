@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { get } from "http";
 import { Like, MoreThan, Repository } from "typeorm";
 import { CreateEventDto } from "./create-event.dto";
 import { Event } from "./event.entity";
@@ -46,7 +47,20 @@ export class EventsController {
             id: 'DESC'
         }
         });
-    } 
+    }
+    
+    @Get('practice2')
+    async practice2(){
+        const event = await this.repository.findOne({where:{id: 7}})
+
+        // when the event is not obtained, the error exception will be thrown
+        if(!event){
+            throw new NotFoundException();
+        }
+
+        return event
+
+    }
 
     @Get(':id')
     // not including the parameter value in the @Param() function, the return value will have a kep value pair returned from the client side
@@ -108,7 +122,7 @@ export class EventsController {
     @HttpCode(204)
     async remove(
         @Param('id', ParseIntPipe) id:number) { 
-        const event = await this.repository.findOne({ where:{ id:id }});
+        const event = await this.repository.findOne({ where:{ id : id }});
         if(!event){
             throw new NotFoundException();
         }
