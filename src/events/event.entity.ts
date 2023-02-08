@@ -17,7 +17,11 @@ export class Event {
     @Column()
     address: string;
     //this is the attendees field that will hold all the people that will attend th event
-    @OneToMany(()=>Attendee, (attendee)=> attendee.event, 
+    @OneToMany(()=>Attendee, (attendee)=> attendee.event,
+    {
+        // can take the true value or a list of operations where cascading should be done like below
+        cascade : ['insert','update']
+    }
     // {
     //     // this makes the retrieval of related entities to be eager by default
     //     //eager: true

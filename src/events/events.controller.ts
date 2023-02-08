@@ -77,13 +77,20 @@ export class EventsController {
 
         
         // this will add a new attendee named william in the attendees table with an eventid matching the id of the event which is 1
-        const event = await this.repository.findOne({where:{id:1}});
+        const event = await this.repository.findOne({
+            where:{id:1},
+            //fetches event together with relation
+            relations:['attendees']
+        });
         
         const attendee = new Attendee();
-        attendee.name = 'William';
-        attendee.event = event;
+        attendee.name = 'Using Cascade ';
+        //attendee.event = event;
 
-        await this.attendeerepository.save(attendee);
+        // pushes the attendee to the list of attendees in the events table
+        event.attendees.push(attendee);
+        // save using the event repository
+        await this.repository.save(event);
 
         return event;
 
@@ -95,7 +102,7 @@ export class EventsController {
     async findOne (@Param('id', ParseIntPipe) id: number) {
         
         // the result of the findOne will naturally be returned by the code
-        const event = await this.repository.findOne({where: {id:id}});
+        const event = await this.repository.findOne({where: { id : id }});
         
         // when the event is not obtained, the error exception will be thrown
         if(!event){
