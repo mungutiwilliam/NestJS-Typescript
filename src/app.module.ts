@@ -9,6 +9,9 @@ import { Attendee } from './attendee/attendee.entity';
 import { Event } from './events/event.entity';
 import { EventsModule } from './events/events.module';
 import { AttendeesModule } from './attendee/attendees.module';
+import { SchoolModule } from './school/school.module';
+import { Subject } from './school/subject.entity';
+import { Teacher } from './school/teacher.entity';
 
 @Module({
   imports: [
@@ -26,7 +29,7 @@ import { AttendeesModule } from './attendee/attendees.module';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     // you just import all entities in order for the type orm to synchronize
-    entities:[Event,Attendee],
+    entities:[Event,Attendee,Subject,Teacher],
     // the synchronise feature enable the database to be updated whenever fields in an entity are updated
     synchronize: true
   }),
@@ -34,7 +37,7 @@ import { AttendeesModule } from './attendee/attendees.module';
 
   // makes repository of specific entity available to be injected by Nest JS 
   
-  EventsModule, AttendeesModule
+  EventsModule, AttendeesModule, SchoolModule
 
 ],
 
