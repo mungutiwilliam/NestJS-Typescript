@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Attendee } from "src/attendee/attendee.entity";
 import { Like, MoreThan, Repository } from "typeorm";
 import { CreateEventDto } from "./create-event.dto";
 import { Event } from "./event.entity";
@@ -15,7 +16,9 @@ export class EventsController {
 
     // argument for the repository class is the entity object that will be used by the repository 
     @InjectRepository(Event)
-    private readonly repository : Repository<Event>
+    private readonly repository : Repository<Event>,
+    @InjectRepository(Attendee)
+    private readonly attendeerepository : Repository<Event>,
    ){}
 
 
@@ -54,23 +57,36 @@ export class EventsController {
     
     @Get('practice2')
     async practice2(){
-        const event = await this.repository.findOne({
-             where : { id : 1},
-            // the load Eager Relations options lets you turn off the eager options in the event entity class
-            // when this oprion is added the attendees will not be included in the result 
-            // loadEagerRelations : true
+        // const event = await this.repository.findOne({
+        //      where : { id : 1},
+        //     // the load Eager Relations options lets you turn off the eager options in the event entity class
+        //     // when this oprion is added the attendees will not be included in the result 
+        //     // loadEagerRelations : true
 
-            // relations options takes in an array of entities that have relations with the event entity
-            // when this is added it will return all attendees
-            relations:['attendees']
-        })
+        //     // relations options takes in an array of entities that have relations with the event entity
+        //     // when this is added it will return all attendees
+        //     relations:['attendees']
+        // })
 
-        // when the event is not obtained, the error exception will be thrown
-        if(!event){
-            throw new NotFoundException();
-        }
+        // // when the event is not obtained, the error exception will be thrown
+        // if(!event){
+        //     throw new NotFoundException();
+        // }
 
-        return event
+        // return event
+
+        
+        // this will add a new attendee named william in the attendees table with an eventid matching the id of the event which is 1
+        const event = await this.repository.findOne({where:{id:1}});
+        
+        const attendee = new Attendee();
+        attendee.name = 'William';
+        attendee.event = event;
+
+        await this.attendeerepository.save(attendee);
+
+        return event;
+
     }
 
     @Get(':id')
