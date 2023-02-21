@@ -8,8 +8,6 @@ export class Attendee {
    id: number;
    @Column()
    name: string;
-
-   
    @ManyToOne(()=> Event, (event) => event.attendees, {
       // you can add other options to make the eventID field not null, originally the eventID is usually null hence the attendee entity can exist on its own
       // this will make the fields to not be null can be removed if you want it to be null
@@ -20,8 +18,5 @@ export class Attendee {
   @JoinColumn(
   { name: 'event_id' }
   )
-  
    event : Event;
-
-
 }
