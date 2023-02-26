@@ -4,6 +4,7 @@ import { Attendee } from "src/attendee/attendee.entity";
 import { Like, MoreThan, Repository } from "typeorm";
 import { CreateEventDto } from "./create-event.dto";
 import { Event } from "./event.entity";
+import { EventsService } from "./events.service";
 import { UpdateEventDto } from "./update-event.dto";
 
 
@@ -19,6 +20,7 @@ export class EventsController {
     private readonly repository : Repository<Event>,
     @InjectRepository(Attendee)
     private readonly attendeerepository : Repository<Event>,
+    private readonly eventsService: EventsService
    ){}
 
 
@@ -77,22 +79,28 @@ export class EventsController {
 
         
         // this will add a new attendee named william in the attendees table with an eventid matching the id of the event which is 1
-        const event = await this.repository.findOne({
-            where:{id:1},
-            //fetches event together with relation
-            relations:['attendees']
-        });
+        // const event = await this.repository.findOne({
+        //     where:{id:1},
+        //     //fetches event together with relation
+        //     relations:['attendees']
+        // });
         
-        const attendee = new Attendee();
-        attendee.name = 'Using Cascade ';
-        //attendee.event = event;
+        // const attendee = new Attendee();
+        // attendee.name = 'Using Cascade ';
+        // //attendee.event = event;
 
-        // pushes the attendee to the list of attendees in the events table
-        event.attendees.push(attendee);
-        // save using the event repository
-        await this.repository.save(event);
+        // // pushes the attendee to the list of attendees in the events table
+        // event.attendees.push(attendee);
+        // // save using the event repository
+        // await this.repository.save(event);
 
-        return event;
+        // return event;
+
+        return await this.repository.createQueryBuilder('event')
+        .select(['event.id', 'event.name','event.when'])
+        .orderBy('event.id', 'ASC')
+        .take(3)
+        .getMany()
 
     }
 
@@ -102,7 +110,7 @@ export class EventsController {
     async findOne (@Param('id', ParseIntPipe) id: number) {
         
         // the result of the findOne will naturally be returned by the code
-        const event = await this.repository.findOne({where: { id : id }});
+        const event = await this.eventsService.getEvent(id);
         
         // when the event is not obtained, the error exception will be thrown
         if(!event){
