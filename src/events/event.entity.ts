@@ -27,5 +27,11 @@ export class Event {
     //     //eager: true
     // }
     )
+    
     attendees: Attendee[]
+    attendeeCount?: number;
+    attendeeRejected?:number;
+    attendedeMaybe?:number;
+    attendeeAccepted?:number;
+
 }
