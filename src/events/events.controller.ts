@@ -7,6 +7,7 @@ import { Event } from "./event.entity";
 import { EventsService } from "./events.service";
 import { UpdateEventDto } from "./input/update-event.dto";
 import { ListEvents } from "./input/list.events";
+import { UsePipes } from "@nestjs/common/decorators";
 
 
 @Controller('/events')
@@ -27,15 +28,19 @@ export class EventsController {
 
 
     @Get()
+    // the VLidation pipes enables population of default values if they are not provided
+    @UsePipes( new ValidationPipe({transform: true}))
     // find all will return a list
     
     async findAll(@Query() filter :ListEvents){
          // the logger class will show when the find all method is reached
-         this.logger.debug(filter)
-        this.logger.log('Hit the findAll route ');
         const events = await this.eventsService
-            .getEventsWithAttendeeCountFiltered(filter);
-        this.logger.debug(`Found ${events.length} events`);
+            .getEventsWithAttendeeCountFilteredPaginated(
+                filter, {
+                    total:true,
+                    currentPage: filter.page,
+                    limit: 2
+                });
         return events
     }
 

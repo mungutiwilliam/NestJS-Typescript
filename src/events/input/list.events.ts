@@ -1,5 +1,6 @@
 export class ListEvents {
     when?: WhenEventFilter = WhenEventFilter.All;
+    page:number = 1
 }
 
 
