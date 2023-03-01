@@ -16,20 +16,21 @@ export class TrainingController {
   @Post('/create')
   public async savingRelation() {
     
-    const subject = new Subject();
-    subject.name = 'Math';
+    // const subject = new Subject();
+    // subject.name = 'Biology';
 
-    //const subject = await this.subjectRepository.findOne({where :{id:3}});
+    
+    const subject = await this.subjectRepository.findOne({where :{id:1}});
 
-    const teacher1 = new Teacher();
-    teacher1.name = 'John Doe';
+    // const teacher1 = new Teacher();
+    // teacher1.name = 'John Doe';
 
-    const teacher2 = new Teacher();
-    teacher2.name = 'Harry Doe';
+    // const teacher2 = new Teacher();
+    // teacher2.name = 'Harry Doe';
 
-    subject.teachers = [teacher1, teacher2];
-    await this.teacherRepository.save([teacher1, teacher2]);
-    await this.subjectRepository.save(subject);
+    // subject.teachers = [teacher1, teacher2];
+    // await this.teacherRepository.save([teacher1, teacher2]);
+    
 
 
     //How to use One to One
@@ -41,30 +42,40 @@ export class TrainingController {
     // Save the user here
 
 
-    // const teacher1 = await this.teacherRepository.findOne({where: {id:5}});
-    // const teacher2 = await this.teacherRepository.findOne({where:{id:6}});
+    const teacher1 = await this.teacherRepository.findOne({where: {id:3}});
+    const teacher2 = await this.teacherRepository.findOne({where:{id:2}});
 
-    // return await this.subjectRepository
-    //   .createQueryBuilder()
-    //   .relation(Subject, 'teachers')
-    //   .of(subject)
-    //   .add([teacher1, teacher2]);
+    return await this.subjectRepository
+      .createQueryBuilder()
+      .relation(Subject, 'teachers')
+      .of(subject)
+      .add([teacher1, teacher2]);
   }
 
+  // changes code in a block  
   @Post('/remove')
   public async removingRelation() {
-    const subject = await this.subjectRepository.findOne(
-      { where:{id:1}, relations: ['teachers'] }
-    );
+    // const subject = await this.subjectRepository.findOne(
+    //   { where:{id:1}, relations: ['teachers'] }
+    // );
 
-    subject.teachers = subject.teachers.filter(
-      teacher => teacher.id !== 2
-    );
+    // subject.teachers = subject.teachers.filter(
+    //   teacher => teacher.id !== 2
+    // );
 
-    await this.subjectRepository.save(subject);
+    // await this.subjectRepository.save(subject);
+
     // await this.subjectRepository.createQueryBuilder('s')
     //   .update()
-    //   .set({ name: "Confidential" })
+    //   // the where key word can help target the specific record to update
+    //   //.where("id = 2")
+    //   .set({ name: "Astrology" })
     //   .execute();
+
+    await this.teacherRepository.createQueryBuilder('t')
+    .update()
+    .where("id = 8")
+    .set({name : "Virginia Wanja"})
+    .execute();
   }
 }
