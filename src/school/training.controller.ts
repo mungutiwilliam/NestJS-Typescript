@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Subject } from './subject.entity';
 import { Teacher } from './teacher.entity';
+import { User } from "src/auth/user.entity";
+import { Profile } from "src/auth/profile.entity";
 
 @Controller('school')
 export class TrainingController {
@@ -30,17 +32,15 @@ export class TrainingController {
 
     // subject.teachers = [teacher1, teacher2];
     // await this.teacherRepository.save([teacher1, teacher2]);
-    
-
 
     //How to use One to One
-    // const user = new User();
-    // const profile = new Profile();
+    const user = new User();
+    const profile  = new Profile();
 
-    // user.profile = profile;
-    // user.profile = null;
-    // Save the user here
-
+    user.profile = profile;
+    user.profile = null;
+    // save user here
+    
 
     const teacher1 = await this.teacherRepository.findOne({where: {id:3}});
     const teacher2 = await this.teacherRepository.findOne({where:{id:2}});
@@ -50,6 +50,7 @@ export class TrainingController {
       .relation(Subject, 'teachers')
       .of(subject)
       .add([teacher1, teacher2]);
+
   }
 
   // changes code in a block  

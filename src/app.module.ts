@@ -12,6 +12,8 @@ import { AttendeesModule } from './attendee/attendees.module';
 import { SchoolModule } from './school/school.module';
 import { Subject } from './school/subject.entity';
 import { Teacher } from './school/teacher.entity';
+import { User } from './auth/user.entity';
+import { Profile } from './auth/profile.entity';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { Teacher } from './school/teacher.entity';
     password: process.env.DB_PASSWORD,
     database: process.env.DB_DATABASE,
     // you just import all entities in order for the type orm to synchronize
-    entities:[Event,Attendee,Subject,Teacher],
+    entities:[Event,Attendee,Subject,Teacher, User, Profile],
     // the synchronise feature enable the database to be updated whenever fields in an entity are updated
     synchronize: true
   }),
