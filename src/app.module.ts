@@ -14,6 +14,7 @@ import { Subject } from './school/subject.entity';
 import { Teacher } from './school/teacher.entity';
 import { User } from './auth/user.entity';
 import { Profile } from './auth/profile.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -39,7 +40,7 @@ import { Profile } from './auth/profile.entity';
 
   // makes repository of specific entity available to be injected by Nest JS 
   
-  EventsModule, AttendeesModule, SchoolModule
+  AuthModule ,EventsModule, AttendeesModule, SchoolModule
 
 ],
 
