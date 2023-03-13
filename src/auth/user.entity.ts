@@ -1,19 +1,19 @@
-import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, OneToOne,PrimaryGeneratedColumn } from "typeorm";
 import { Profile } from "./profile.entity";
 
 @ Entity()
 export class User {
 
     @PrimaryGeneratedColumn()
-    id: number;
+    id?: number;
 
-    @Column()
+    @Column({unique:true})
     username: string;
 
     @Column()
     password: string;
 
-    @Column()
+    @Column({unique:true})
     email: string;
 
     @Column()
@@ -25,5 +25,5 @@ export class User {
     @OneToOne(()=> Profile)
     // Join column means on the user table there will be a profile Id column linking to the relationship betwen user and profile
     @JoinColumn() 
-    profile : Profile;
+    profile? : Profile;
 }

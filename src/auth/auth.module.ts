@@ -6,6 +6,7 @@ import {AuthController} from "./auth.controller";
 import { JwtModule } from "@nestjs/jwt";
 import { AuthService } from "./auth.service";
 import { JwtStrategy } from "./jwt.stategy";
+import { UsersController } from "./users.controller";
 
 
 
@@ -22,7 +23,7 @@ import { JwtStrategy } from "./jwt.stategy";
         })],
         // these are all thatare injectables
         providers: [LocatStrategy,JwtStrategy, AuthService],
-        controllers: [AuthController]
+        controllers: [AuthController, UsersController]
 
     }
 )
