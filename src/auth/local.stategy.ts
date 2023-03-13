@@ -12,7 +12,7 @@ import * as bcrypt from "bcrypt";
 
 @Injectable()
 // the Passport strategy can be given a name by passing it after the 'Stategy' parameter seperated with a comma
- export class LocatStrategy extends PassportStrategy(Strategy, 'Verify user') {
+ export class LocatStrategy extends PassportStrategy(Strategy) {
 
     private readonly logger = new Logger(LocatStrategy.name);
 
@@ -41,5 +41,4 @@ import * as bcrypt from "bcrypt";
             }
             return user;
     }
-
  }

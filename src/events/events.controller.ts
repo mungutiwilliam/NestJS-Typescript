@@ -7,7 +7,10 @@ import { Event } from "./event.entity";
 import { EventsService } from "./events.service";
 import { UpdateEventDto } from "./input/update-event.dto";
 import { ListEvents } from "./input/list.events";
-import { UsePipes } from "@nestjs/common/decorators";
+import { UseGuards, UsePipes } from "@nestjs/common/decorators";
+import { CurrentUser } from "src/auth/current-user.decorator";
+import { User } from "src/auth/user.entity";
+import { AuthGuardJwt } from "src/auth/auth-guard.jwt";
 
 
 @Controller('/events')
@@ -129,17 +132,18 @@ export class EventsController {
     }
 
     @Post()
+    // the user Guards Will make sure that the event will always be organised by a logged in user
+    @UseGuards(AuthGuardJwt)
     // createEventDto is the predefined payload that nestjs will be expecting from the body
     // its contents have been defined in the 'create-events-dto.ts' file
     // the ValidationPipe enables the data coming in as the body to be validated  
     async create(
         // this is local validation ->   new ValidationPipe({groups:['create']})
-        @Body() new_data: CreateEventDto) {
+        @Body() new_data: CreateEventDto,
+        @CurrentUser() user : User) {
 
-        return await this.repository.save({
-            ... new_data,
-            when: new Date(new_data.when),
-        });
+        return await this.eventsService.createEvent(new_data,user);
+
     }
 
 

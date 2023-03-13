@@ -1,4 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/auth/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Attendee } from "../attendee/attendee.entity";
 
 
@@ -28,7 +29,16 @@ export class Event {
     // }
     )
     
-    attendees: Attendee[]
+    attendees: Attendee[];
+
+    @ManyToOne( ()=> User, (user)=>user.organized )
+    @JoinColumn({name:'organizerId'})
+    organizer: User;
+
+    // enables if there were existing records without Organizer Id to still exist in the database
+    @Column({nullable: true})
+    organizerId: number;
+
     attendeeCount?: number;
     attendeeRejected?:number;
     attendedeMaybe?:number;

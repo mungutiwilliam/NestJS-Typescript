@@ -29,18 +29,18 @@ export class UsersController {
             // or email is
             {email:CreateUserDto.email}
            ]
-          
         })
         if(exist_user){
             throw new BadRequestException(['The username or Email is already taken'])
         }
-        user ={
-            username:CreateUserDto.username,
-            password: await this.authService.hashPassword(CreateUserDto.password),
-            email:CreateUserDto.email,
-            firstName:CreateUserDto.firstName,
-            lastName:CreateUserDto.lastName
-        }
+        
+            user.username = CreateUserDto.username,
+            user.password = await this.authService.hashPassword(CreateUserDto.password),
+            user.email = CreateUserDto.email,
+            user.firstName = CreateUserDto.firstName,
+            user.lastName = CreateUserDto.lastName
+        
+    
         return {
             ... (await this.userRepository.save(user)),
             token: this.authService.getTokenForuser(user)
