@@ -7,6 +7,7 @@ import { DeleteResult, Repository } from "typeorm"
 import { Event } from "./event.entity"
 import { CreateEventDto } from "./input/create-event.dto";
 import { ListEvents, WhenEventFilter } from "./input/list.events";
+import { UpdateEventDto } from "./input/update-event.dto";
 
 
 @Injectable()
@@ -138,6 +139,13 @@ export class EventsService {
             ... new_data,
             organizer : user,
             when: new Date(new_data.when),
+        });
+    }
+
+    public async updateEvent (event:Event, updates:UpdateEventDto): Promise<Event>{
+        return await this.eventsRepository.save({
+            ...event,
+            ... updates
         });
     }
 
