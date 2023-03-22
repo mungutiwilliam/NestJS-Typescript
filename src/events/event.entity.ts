@@ -1,6 +1,7 @@
 import { Expose, Type } from "class-transformer";
 import { IsArray, IsDate, IsNumber, IsObject, IsString } from "class-validator";
 import { User } from "src/auth/user.entity";
+import { PaginationResult } from "src/pagination/paginator";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { Attendee } from "../attendee/attendee.entity";
 
@@ -80,3 +81,7 @@ export class Event {
     attendeeAccepted?:number;
 
 }
+
+
+// is an alias for the paginated results with generic type event 
+export type PaginatedEvents = PaginationResult<Event>;

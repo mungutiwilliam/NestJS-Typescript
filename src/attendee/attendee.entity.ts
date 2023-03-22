@@ -1,4 +1,5 @@
 import { Expose } from "class-transformer";
+import { User } from "src/auth/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 import { Event } from "../events/event.entity";
@@ -28,7 +29,13 @@ export class Attendee {
   @JoinColumn(
   { name: 'event_id' }
   )
-   event : Event;
+  event : Event;
+
+  // defining these columns used in the relationships will save you having to fetch an event first then associating it with an attendee
+  // this will automatically create a relationship
+  @Column()
+  eventId: number;
+   
    @Column('enum',{
       enum: AttendeeAnswerEnum,
       default:AttendeeAnswerEnum.Accepted
@@ -36,4 +43,12 @@ export class Attendee {
 
    @Expose()
    answer: AttendeeAnswerEnum;
+
+   @ManyToOne(()=> User, (user)=>user.attended)
+   user: User;
+
+   // defining these columns used in the relationships will save you having to fetch an event first then associating it with an attendee
+  // this will automatically create a relationship
+   @Column()
+   userId:number;
 }
