@@ -11,7 +11,8 @@ async function bootstrap() {
     // }
     );
   // this is the global validation
-  app.useGlobalPipes(new ValidationPipe( ))
+  //app.useGlobalPipes(new ValidationPipe( ))
+  app.useGlobalPipes(new ValidationPipe({ forbidUnknownValues: false }))
   await app.listen(3000);
 }
 bootstrap();

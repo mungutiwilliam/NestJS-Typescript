@@ -1,4 +1,4 @@
-import {Controller, Post, UseGuards, Request, Get} from "@nestjs/common"
+import {Controller, Post, UseGuards, Request, Get, SerializeOptions, UseInterceptors, ClassSerializerInterceptor} from "@nestjs/common"
 import { AuthGuard } from "@nestjs/passport";
 import { AuthGuardJwt } from "./auth-guard.jwt";
 import { AuthGuardLocal } from "./auth-guard.local";
@@ -8,6 +8,10 @@ import { User } from "./user.entity";
 
 
 @Controller('auth')
+@SerializeOptions({
+    strategy:'excludeAll',
+
+})
 export class AuthController {
 
     constructor (
@@ -28,6 +32,7 @@ export class AuthController {
     }
 
     @Get('profile')
+    @UseInterceptors(ClassSerializerInterceptor)
     @UseGuards(AuthGuardJwt)
     async getProfile(@CurrentUser() user : User){
         return user

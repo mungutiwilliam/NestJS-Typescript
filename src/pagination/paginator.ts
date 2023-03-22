@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { SelectQueryBuilder } from "typeorm";
 
 // hold possible options for pagination
@@ -9,12 +10,26 @@ export interface PaginateOptions {
 }
 
 // the <T> shows that it is a generic data type hence can be used by different classes/ can be re-used 
-export interface PaginationResult <T> {
+export class PaginationResult <T> {
+    constructor (partial: Partial<PaginationResult <T>>){
+        Object.assign(this, partial);
+    }
+
+
+    @Expose()
     first :number;
+
+    @Expose()
     last: number;
+
+    @Expose()
     limit :number;
+
+    @Expose()
     total? :number;
+
     // the data that will be returned as a result
+    @Expose()
     data : T[];
 }
 
@@ -34,11 +49,11 @@ export async function paginate <T> (
     const offset = (options.currentPage - 1) * options.limit;
     const data = await qb.limit(options.limit).offset(offset).getMany();
 
-    return{
+    return new PaginationResult({
         first : offset + 1,
         last : offset + data.length,
         limit : options.limit,
         total : options.total ? await qb.getCount() : null,
         data
-    }
+    })
 }

@@ -8,8 +8,10 @@ export class CreateEventDto {
     @Length(5,255, { message: "The name length is wrong"})
     @Length(5,255, {message: "The name length is wrong"})
     name: string;
+    @IsString()
     @Length(5,255, {message: "Your description should be longer"})
     description: string;
+    @IsString()
     @IsDateString()
     when: string;
     // the groups enable one to enter a validation for the route it is attached to, the create will validate creation of new data, while the update 
@@ -17,6 +19,7 @@ export class CreateEventDto {
     //... only the create route and this -> {groups: ['update'], message:"The address entered is not in the correct format"} will only validate the update route
     @Length(5,255)
     @Length(5,255)
+    @IsString()
     address: string;
 
 }

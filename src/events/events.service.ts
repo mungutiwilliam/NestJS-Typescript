@@ -1,161 +1,140 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm"
-import { AttendeeAnswerEnum } from "src/attendee/attendee.entity";
-import { User } from "src/auth/user.entity";
-import { paginate, PaginateOptions } from "src/pagination/paginator";
-import { DeleteResult, Repository } from "typeorm"
-import { Event } from "./event.entity"
-import { CreateEventDto } from "./input/create-event.dto";
-import { ListEvents, WhenEventFilter } from "./input/list.events";
-import { UpdateEventDto } from "./input/update-event.dto";
-
+import { Injectable, Logger } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { User } from 'src/auth/user.entity';
+import { paginate, PaginateOptions } from 'src/pagination/paginator';
+import { DeleteResult, Repository } from "typeorm";
+import { AttendeeAnswerEnum } from './../attendee/attendee.entity';
+import { Event } from "./event.entity";
+import { CreateEventDto } from './input/create-event.dto';
+import { ListEvents, WhenEventFilter } from './input/list.events';
+import { UpdateEventDto } from './input/update-event.dto';
 
 @Injectable()
 export class EventsService {
-    private readonly logger = new Logger(EventsService.name);
+  private readonly logger = new Logger(EventsService.name);
 
-    constructor(
-        @InjectRepository(Event)
-        private readonly eventsRepository: Repository<Event>
-    ){}
-    private getEventsBaseQuery (){
-        return this.eventsRepository.createQueryBuilder('e')
-        .orderBy('e.id','DESC')
+  constructor(
+    @InjectRepository(Event)
+    private readonly eventsRepository: Repository<Event>
+  ) { }
+
+  private getEventsBaseQuery() {
+    return this.eventsRepository
+      .createQueryBuilder('e')
+      .orderBy('e.id', 'DESC');
+  }
+
+  public getEventsWithAttendeeCountQuery() {
+    return this.getEventsBaseQuery()
+      .loadRelationCountAndMap(
+        'e.attendeeCount', 'e.attendees'
+      )
+      .loadRelationCountAndMap(
+        'e.attendeeAccepted',
+        'e.attendees',
+        'attendee',
+        (qb) => qb
+          .where(
+            'attendee.answer = :answer',
+            { answer: AttendeeAnswerEnum.Accepted }
+          )
+      )
+      .loadRelationCountAndMap(
+        'e.attendeeMaybe',
+        'e.attendees',
+        'attendee',
+        (qb) => qb
+          .where(
+            'attendee.answer = :answer',
+            { answer: AttendeeAnswerEnum.Maybe }
+          )
+      )
+      .loadRelationCountAndMap(
+        'e.attendeeRejected',
+        'e.attendees',
+        'attendee',
+        (qb) => qb
+          .where(
+            'attendee.answer = :answer',
+            { answer: AttendeeAnswerEnum.Rejected }
+          )
+      )
+  }
+
+  private async getEventsWithAttendeeCountFiltered(
+    filter?: ListEvents
+  ) {
+    let query = this.getEventsWithAttendeeCountQuery();
+
+    if (!filter) {
+      return query;
     }
 
-    public getEventsWithAttendeeCountQuery (){
-        return this.getEventsBaseQuery()
-        //counts all related entities between two tables and will output as a virtual information
-        .loadRelationCountAndMap(
-            // first parameter is the name of the property  and the second parameter is relation name 
-            'e.attendeeCount','e.attendees'
-        )
-
-        // will return the follwowing details as added information
-        .loadRelationCountAndMap(
-            // person who accepted ivite
-            'e.attendeeAccepted',
-            // the relation
-            'e.attendees',
-            // the alias required for another query builder
-            'attendee',
-            // another relationuery builder starts here which is an inline query builder that specifies exactly what we want to join for the above particular method (function/query)call
-            (qb) => qb
-            .where('attendee. answer = :answer', 
-            {answer: AttendeeAnswerEnum.Accepted}
-            )
-        )
-
-        .loadRelationCountAndMap(
-            // person who accepted ivite
-            'e.attendeeMaybe',
-            // the relation
-            'e.attendees',
-            // the alias required for another query builder
-            'attendee',
-            // another relationuery builder starts here which is an inline query builder that specifies exactly what we want to join for the above particular method (function/query)call
-            (qb) => qb
-            .where('attendee. answer = :answer', 
-            {answer: AttendeeAnswerEnum.Maybe}
-            )
-        )
-        .loadRelationCountAndMap(
-            // person who accepted ivite
-            'e.attendeeRejected',
-            // the relation
-            'e.attendees',
-            // the alias required for another query builder
-            'attendee',
-            // another relationuery builder starts here which is an inline query builder that specifies exactly what we want to join for the above particular method (function/query)call
-            (qb) => qb
-            .where('attendee. answer = :answer', 
-            {answer: AttendeeAnswerEnum.Rejected}
-            )
-        )
-    }
-
-    private async getEventsWithAttendeeCountFiltered(
-        filter?: ListEvents
-        ){
-        let query = this.getEventsWithAttendeeCountQuery();
-        if(!filter){
-            return query;
-        }
-
-        if (filter.when){
-            if(filter.when === WhenEventFilter.Today){
-                query = query.andWhere(
-                    `e.when >= CURDATE() + AND e.when <= CURDATE() + INTERVAL 1 DAY`
-                );
-            }
-
-            if(filter.when === WhenEventFilter.Tomorrow){
-                query = query.andWhere(
-                    `e.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE() + INTERVAL 2 DAY`
-                );
-            }
-
-            if(filter.when === WhenEventFilter.ThisWeek){
-                query = query.andWhere('YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1)');
-            }
-
-            if(filter.when === WhenEventFilter.NextWeek){
-                query = query.andWhere('YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1 + 1)');
-            }
-        }
-
-        return await query;
-    }
-
-
-
-    public async getEventsWithAttendeeCountFilteredPaginated(
-        filter: ListEvents,
-        PaginateOptions: PaginateOptions
-    ){
-        return await paginate(
-            await this.getEventsWithAttendeeCountFiltered(filter),
-            PaginateOptions
+    if (filter.when) {
+      if (filter.when == WhenEventFilter.Today) {
+        query = query.andWhere(
+          `e.when >= CURDATE() AND e.when <= CURDATE() + INTERVAL 1 DAY`
         );
+      }
+
+      if (filter.when == WhenEventFilter.Tomorrow) {
+        query = query.andWhere(
+          `e.when >= CURDATE() + INTERVAL 1 DAY AND e.when <= CURDATE() + INTERVAL 2 DAY`
+        );
+      }
+
+      if (filter.when == WhenEventFilter.ThisWeek) {
+        query = query.andWhere('YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1)');
+      }
+
+      if (filter.when == WhenEventFilter.NextWeek) {
+        query = query.andWhere('YEARWEEK(e.when, 1) = YEARWEEK(CURDATE(), 1) + 1');
+      }
     }
 
+    return query;
+  }
 
-    
+  public async getEventsWithAttendeeCountFilteredPaginated(
+    filter: ListEvents,
+    paginateOptions: PaginateOptions
+  ) {
+    return await paginate(
+      await this.getEventsWithAttendeeCountFiltered(filter),
+      paginateOptions
+    );
+  }
 
-    // the promise defines the return value , in this case the 'undefined means that the event may not exist in the database'
-    public async getEvent(id:number): Promise<Event | undefined>{
-        const query =  this.getEventsWithAttendeeCountQuery()
-        .andWhere('e.id = :id', {id});
+  public async getEvent(id: number): Promise<Event | undefined> {
+    const query = this.getEventsWithAttendeeCountQuery()
+      .andWhere('e.id = :id', { id });
 
-        this.logger.debug(query.getSql());
+    this.logger.debug(query.getSql());
 
+    return await query.getOne();
+  }
 
-        return await query.getOne();
-    }
+  public async createEvent(input: CreateEventDto, user: User): Promise<Event> {
+    return await this.eventsRepository.save({
+      ...input,
+      organizer: user,
+      when: new Date(input.when)
+    });
+  }
 
+  public async updateEvent(event: Event, input: UpdateEventDto): Promise<Event> {
+    return await this.eventsRepository.save({
+      ...event,
+      ...input,
+      when: input.when ? new Date(input.when) : event.when
+    });
+  }
 
-    public async createEvent(new_data:CreateEventDto, user: User) : Promise<Event>{
-        return await this.eventsRepository.save({
-            ... new_data,
-            organizer : user,
-            when: new Date(new_data.when),
-        });
-    }
-
-    public async updateEvent (event:Event, updates:UpdateEventDto): Promise<Event>{
-        return await this.eventsRepository.save({
-            ...event,
-            ... updates
-        });
-    }
-
-    
-    public async deleteEvent ( id : number):Promise<DeleteResult> {
-        return await this.eventsRepository
-        .createQueryBuilder('e')
-        .delete()
-        .where('id = :id', {id})
-        .execute()
-
-    }
+  public async deleteEvent(id: number): Promise<DeleteResult> {
+    return await this.eventsRepository
+      .createQueryBuilder('e')
+      .delete()
+      .where('id = :id', { id })
+      .execute();
+  }
 }

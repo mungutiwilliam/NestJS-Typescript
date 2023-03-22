@@ -1,3 +1,4 @@
+import { Expose } from "class-transformer";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 import { Event } from "../events/event.entity";
@@ -11,8 +12,11 @@ export enum AttendeeAnswerEnum {
 @Entity()
 export class Attendee {
    @PrimaryGeneratedColumn()
+   @Expose()
    id: number;
+
    @Column()
+   @Expose()
    name: string;
    @ManyToOne(()=> Event, (event) => event.attendees, {
       // you can add other options to make the eventID field not null, originally the eventID is usually null hence the attendee entity can exist on its own
@@ -29,5 +33,7 @@ export class Attendee {
       enum: AttendeeAnswerEnum,
       default:AttendeeAnswerEnum.Accepted
    })
+
+   @Expose()
    answer: AttendeeAnswerEnum;
 }

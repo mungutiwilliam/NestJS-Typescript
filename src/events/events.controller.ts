@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, ValidationPipe } from "@nestjs/common";
+import { Body, ClassSerializerInterceptor, Controller, Delete, ForbiddenException, Get, HttpCode, Logger, NotFoundException, Param, ParseIntPipe, Patch, Post, Query, SerializeOptions, ValidationPipe } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Attendee } from "src/attendee/attendee.entity";
 import { Like, MoreThan, Repository } from "typeorm";
@@ -7,13 +7,17 @@ import { Event } from "./event.entity";
 import { EventsService } from "./events.service";
 import { UpdateEventDto } from "./input/update-event.dto";
 import { ListEvents } from "./input/list.events";
-import { UseGuards, UsePipes } from "@nestjs/common/decorators";
+import { UseGuards, UseInterceptors, UsePipes } from "@nestjs/common/decorators";
 import { CurrentUser } from "src/auth/current-user.decorator";
 import { User } from "src/auth/user.entity";
 import { AuthGuardJwt } from "src/auth/auth-guard.jwt";
 
 
 @Controller('/events')
+@SerializeOptions({
+    strategy:'excludeAll',
+
+})
 export class EventsController {
     private readonly logger = new Logger(EventsController.name);
     // logger contains three log levels : debug, warning and error 
@@ -21,8 +25,8 @@ export class EventsController {
    constructor(
 
     // argument for the repository class is the entity object that will be used by the repository 
-    // @InjectRepository(Event)
-    // private readonly repository : Repository<Event>,
+     //@InjectRepository(Event)
+     //private readonly repository : Repository<Event>,
     // @InjectRepository(Attendee)
     // private readonly attendeerepository : Repository<Event>,
     private readonly eventsService: EventsService
@@ -30,22 +34,22 @@ export class EventsController {
 
 
 
-    // @Get()
-    // // the VLidation pipes enables population of default values if they are not provided
-    // @UsePipes( new ValidationPipe({transform: true}))
-    // // find all will return a list
-    
-    // async findAll(@Query() filter :ListEvents){
-    //      // the logger class will show when the find all method is reached
-    //     const events = await this.eventsService
-    //         .getEventsWithAttendeeCountFilteredPaginated(
-    //             filter, {
-    //                 total:true,
-    //                 currentPage: filter.page,
-    //                 limit: 2
-    //             });
-    //     return events
-    // }
+    @Get()
+    // the VLidation pipes enables population of default values if they are not provided
+    //@UsePipes( new ValidationPipe({transform: true}))
+    @UseInterceptors(ClassSerializerInterceptor)
+    // find all will return a list
+    async findAll(@Query() filter :ListEvents){
+         // the logger class will show when the find all method is reached
+        const events = await this.eventsService
+            .getEventsWithAttendeeCountFilteredPaginated(
+                filter, {
+                    total:true,
+                    currentPage: filter.page,
+                    limit: 2
+                });
+        return events
+    }
 
     // @Get('/practice')
     // // practice stands for the route to be used
@@ -116,6 +120,7 @@ export class EventsController {
     // }
 
     @Get(':id')
+    @UseInterceptors(ClassSerializerInterceptor)
     // not including the parameter value in the @Param() function, the return value will have a key value pair returned from the client side
     // the expected return will be  "id" : "id_value" else the return will ve just the value by itself
     async findOne (@Param('id', ParseIntPipe) id: number) {
@@ -134,6 +139,7 @@ export class EventsController {
     @Post()
     // the user Guards Will make sure that the event will always be organised by a logged in user
     @UseGuards(AuthGuardJwt)
+    @UseInterceptors(ClassSerializerInterceptor)
     // createEventDto is the predefined payload that nestjs will be expecting from the body
     // its contents have been defined in the 'create-events-dto.ts' file
     // the ValidationPipe enables the data coming in as the body to be validated  
@@ -149,6 +155,7 @@ export class EventsController {
 
     @Patch(':id')
     @UseGuards(AuthGuardJwt)
+    @UseInterceptors(ClassSerializerInterceptor)
 
     async update(
         @Param('id', ParseIntPipe) id:number , 
