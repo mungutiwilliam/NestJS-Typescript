@@ -4,7 +4,7 @@ import { User } from 'src/auth/user.entity';
 import { paginate, PaginateOptions } from 'src/pagination/paginator';
 import { DeleteResult, Repository } from "typeorm";
 import { AttendeeAnswerEnum } from './../attendee/attendee.entity';
-import { Event } from "./event.entity";
+import { Event, PaginatedEvents } from "./event.entity";
 import { CreateEventDto } from './input/create-event.dto';
 import { ListEvents, WhenEventFilter } from './input/list.events';
 import { UpdateEventDto } from './input/update-event.dto';
@@ -23,6 +23,8 @@ export class EventsService {
       .createQueryBuilder('e')
       .orderBy('e.id', 'DESC');
   }
+
+
 
   public getEventsWithAttendeeCountQuery() {
     return this.getEventsBaseQuery()
@@ -61,6 +63,8 @@ export class EventsService {
       )
   }
 
+
+
   private async getEventsWithAttendeeCountFiltered(
     filter?: ListEvents
   ) {
@@ -95,15 +99,19 @@ export class EventsService {
     return query;
   }
 
+
+
   public async getEventsWithAttendeeCountFilteredPaginated(
     filter: ListEvents,
     paginateOptions: PaginateOptions
-  ) {
+  ) : Promise<PaginatedEvents> {
     return await paginate(
       await this.getEventsWithAttendeeCountFiltered(filter),
       paginateOptions
     );
   }
+
+
 
   public async getEvent(id: number): Promise<Event | undefined> {
     const query = this.getEventsWithAttendeeCountQuery()
@@ -114,6 +122,8 @@ export class EventsService {
     return await query.getOne();
   }
 
+
+
   public async createEvent(input: CreateEventDto, user: User): Promise<Event> {
     return await this.eventsRepository.save({
       ...input,
@@ -121,6 +131,8 @@ export class EventsService {
       when: new Date(input.when)
     });
   }
+
+
 
   public async updateEvent(event: Event, input: UpdateEventDto): Promise<Event> {
     return await this.eventsRepository.save({
@@ -130,6 +142,8 @@ export class EventsService {
     });
   }
 
+
+
   public async deleteEvent(id: number): Promise<DeleteResult> {
     return await this.eventsRepository
       .createQueryBuilder('e')
@@ -137,4 +151,25 @@ export class EventsService {
       .where('id = :id', { id })
       .execute();
   }
+
+
+
+  public async getEventsOrganizedByUserIdPaginated (userId : number, paginateOptions :PaginateOptions) : Promise <PaginatedEvents> {
+
+    return  await paginate<Event>(
+      this.getEventsOrganizedByUserIdQuery(userId),
+      paginateOptions
+    );
+  }
+
+
+  // query to get all events organized by a user of the specific ID
+  private getEventsOrganizedByUserIdQuery (
+    userId :number
+  ){
+    return this.getEventsBaseQuery()
+      .where('e.organizerId = :userId', {userId});
+  } 
+
+
 }
