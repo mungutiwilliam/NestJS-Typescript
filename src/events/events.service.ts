@@ -172,4 +172,24 @@ export class EventsService {
   } 
 
 
+  public async getEventsAttendedByUserIdPaginated (userId : number, paginateOptions :PaginateOptions) : Promise <PaginatedEvents> {
+
+    return  await paginate<Event>(
+      this.getEventsOrganizedByUserIdQuery(userId),
+      paginateOptions
+    );
+  }
+
+
+  // query to get all events organized by a user of the specific ID
+  private getEventsAttendedByUserIdQuery (
+    userId :number
+  ){
+    return this.getEventsBaseQuery()
+      .leftJoinAndSelect('e.attendees','a')
+      // user id of the currently autheticated user
+      .where('a.userId = :userId',{userId})
+  } 
+
+
 }

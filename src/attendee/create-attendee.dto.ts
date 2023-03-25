@@ -1,4 +1,5 @@
-import { IsDateString, isDateString, IsString, Length } from "class-validator";
+import { IsDateString, isDateString, IsEnum, IsString, Length } from "class-validator";
+import { AttendeeAnswerEnum } from "./attendee.entity";
 
 export class CreateAttenndeeDto {
 
@@ -9,5 +10,8 @@ export class CreateAttenndeeDto {
     @Length(5,255, {message: "The name length is wrong"})
     name: string;
     event_id: number;
+
+    @IsEnum(AttendeeAnswerEnum)
+    answer: AttendeeAnswerEnum;
 
 }
